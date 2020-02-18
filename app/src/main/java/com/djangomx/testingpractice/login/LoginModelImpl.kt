@@ -24,6 +24,10 @@ class LoginModelImpl : LoginContract.LoginModel {
         }, 2000)
     }
 
+    override fun validateUserCredentialsWithCallback(callback: CallbackLogin) {
+        callback.result(true)
+    }
+
     override suspend fun validateUserCredentialsSuspend(
         userName: String,
         password: String

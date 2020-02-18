@@ -7,7 +7,7 @@ import kotlinx.coroutines.*
 class LoginPresenterImpl : LoginContract.LoginPresenter {
 
     private var mView: LoginContract.LoginView? = null
-    private lateinit var mModel: LoginContract.LoginModel
+    private var mModel: LoginContract.LoginModel ? = null
 
     private val completableJob = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.IO + completableJob)
@@ -19,6 +19,7 @@ class LoginPresenterImpl : LoginContract.LoginPresenter {
 
     override fun detachView() {
         this.mView = null
+        mModel = null
     }
 
     override fun onLoginButtonClick() {
@@ -36,7 +37,7 @@ class LoginPresenterImpl : LoginContract.LoginPresenter {
         }
 
         mView?.showLoading()
-        val result = mModel.validateUserCredentials(user, password)
+        val result = mModel?.validateUserCredentials(user, password)?:false
         mView?.dismissLoading()
 
         if (result) mView?.successAuth() else mView?.errorAuth()
@@ -58,7 +59,7 @@ class LoginPresenterImpl : LoginContract.LoginPresenter {
 
         mView?.showLoading()
 
-        mModel.validateUserCredentialsWithCallback(user, password, object : CallbackLogin {
+        mModel?.validateUserCredentialsWithCallback(user,password,object : CallbackLogin {
             override fun result(success: Boolean) {
                 mView?.dismissLoading()
                 if (success) mView?.successAuth() else mView?.errorAuth()
@@ -84,7 +85,7 @@ class LoginPresenterImpl : LoginContract.LoginPresenter {
         mView?.showLoading()
 
         coroutineScope.launch {
-            val result = mModel.validateUserCredentialsSuspend(user, password)
+            val result = mModel?.validateUserCredentialsSuspend(user, password)?:false
             withContext(Dispatchers.Main){
                 mView?.dismissLoading()
                 if (result) mView?.successAuth() else mView?.errorAuth()

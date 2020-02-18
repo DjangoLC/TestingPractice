@@ -7,6 +7,7 @@ import org.mockito.Captor
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.djangomx.testingpractice.R
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
@@ -25,9 +26,6 @@ class LoginActTest {
 
     private lateinit var passworCorrect: String
     private lateinit var paswordFail: String
-
-    @Captor
-    private lateinit var operationCallbackCaptor: ArgumentCaptor<CallbackLogin>
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -100,47 +98,78 @@ class LoginActTest {
         verify(mView).showPasswordEmpty(R.string.password_empty)
     }
 
+
+    @Test
+    fun validateCredentialsWithSuspendSuccess() = runBlockingTest {
+        whenever(mView.getUserName()).thenReturn(userCorrect)
+        whenever(mView.getPassword()).thenReturn(passworCorrect)
+
+
+        whenever(
+            mModel.validateUserCredentialsSuspend(
+                userCorrect,
+                passworCorrect
+            )
+        ).thenReturn(true)
+
+        mPresenter.onLoginAsyncCoroutineButtonClick()
+        verify(mView, times(1)).successAuth()
+
+    }
+
     @Test
     fun validateCredentialsWithCallbackSuccess() {
 
-        verify(mModel).validateUserCredentialsWithCallback(userCorrect,passworCorrect,capture(operationCallbackCaptor))
-        operationCallbackCaptor.value.result(false)
+        whenever(mView.getUserName()).thenReturn(userCorrect)
+        whenever(mView.getPassword()).thenReturn(passworCorrect)
+        val response = true
+
+        doAnswer {
+            (it.getArgument(0) as String)
+            (it.getArgument(1) as String)
+            (it.getArgument(2) as CallbackLogin).result(response)
+            return@doAnswer null
+        }.whenever(mModel).validateUserCredentialsWithCallback(any(), any(), any())
 
         mPresenter.onLoginAsyncButtonClick()
+        verify(mView).successAuth()
+    }
+
+    @Test
+    fun validateCredentialsWithCallbackError() {
+
+        whenever(mView.getUserName()).thenReturn(userCorrect)
+        whenever(mView.getPassword()).thenReturn(passworCorrect)
+        val response = false
+
+        doAnswer {
+            (it.getArgument(0) as String)
+            (it.getArgument(1) as String)
+            (it.getArgument(2) as CallbackLogin).result(response)
+            return@doAnswer null
+        }.whenever(mModel).validateUserCredentialsWithCallback(any(), any(), any())
+
+        mPresenter.onLoginAsyncButtonClick()
+        verify(mView).errorAuth()
+    }
+
+
+    @Test
+    fun validateCredentialsWithSuspendError() = runBlockingTest {
+        whenever(mView.getUserName()).thenReturn(userCorrect)
+        whenever(mView.getPassword()).thenReturn(paswordFail)
+
+        whenever(mModel.validateUserCredentialsSuspend(userCorrect, paswordFail)).thenReturn(false)
+
+        mPresenter.onLoginAsyncCoroutineButtonClick()
         verify(mView).errorAuth()
 
     }
 
-
-    @Test
-    fun validateCredentialsWithSuspendSuccess() {
-        whenever(mView.getUserName()).thenReturn(userCorrect)
-        whenever(mView.getPassword()).thenReturn(passworCorrect)
-
-        runBlockingTest {
-            whenever(mModel.validateUserCredentialsSuspend(userCorrect,passworCorrect)).thenReturn(true)
-
-            mPresenter.onLoginAsyncCoroutineButtonClick()
-            verify(mView, times(1)).successAuth()
-        }
-    }
-
-    @Test
-    fun validateCredentialsWithSuspendError() {
-        whenever(mView.getUserName()).thenReturn(userCorrect)
-        whenever(mView.getPassword()).thenReturn(paswordFail)
-
-        runBlockingTest {
-            whenever(mModel.validateUserCredentialsSuspend(userCorrect,paswordFail)).thenReturn(false)
-
-            mPresenter.onLoginAsyncCoroutineButtonClick()
-            verify(mView, times(1)).errorAuth()
-        }
-    }
-
-
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        testDispatcher.cleanupTestCoroutines()
+        mPresenter.detachView()
     }
 }

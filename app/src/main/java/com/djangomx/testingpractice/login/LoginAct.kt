@@ -1,5 +1,6 @@
 package com.djangomx.testingpractice.login
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -20,6 +21,7 @@ class LoginAct : AppCompatActivity(),LoginContract.LoginView {
 
         btnLogin.setOnClickListener {
             mPresenter.onLoginButtonClick()
+            val intent: Intent = Intent(this, LoginAct::class.java)
         }
 
         btnLoginAsync.setOnClickListener {

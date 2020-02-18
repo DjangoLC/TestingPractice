@@ -25,6 +25,10 @@ class LoginAct : AppCompatActivity(),LoginContract.LoginView {
         btnLoginAsync.setOnClickListener {
             mPresenter.onLoginAsyncButtonClick()
         }
+
+        btnLoginAsyncCoroutine.setOnClickListener {
+            mPresenter.onLoginAsyncCoroutineButtonClick()
+        }
     }
 
     override fun onDestroy() {

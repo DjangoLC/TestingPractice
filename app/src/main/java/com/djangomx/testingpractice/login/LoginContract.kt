@@ -22,11 +22,21 @@ interface LoginContract {
     interface LoginPresenter : BasePresenter<LoginView, LoginModel> {
         fun onLoginButtonClick()
         fun onLoginAsyncButtonClick()
+        fun onLoginAsyncCoroutineButtonClick()
     }
 
     interface LoginModel {
         fun validateUserCredentials(userName: String, password: String): Boolean
-        fun validateUserCredentialsWithCallback(callback: CallbackLogin)
+        fun validateUserCredentialsWithCallback(
+            userName: String,
+            password: String,
+            callback: CallbackLogin
+        )
+
+        suspend fun validateUserCredentialsSuspend(
+            userName: String,
+            password: String
+        ) : Boolean
     }
 
 }

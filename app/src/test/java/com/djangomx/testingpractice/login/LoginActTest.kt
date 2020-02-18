@@ -95,12 +95,11 @@ class LoginActTest {
     @Test
     fun validateCredentialsWithCallbackSuccess() {
 
-        verify(mModel).validateUserCredentialsWithCallback(capture(operationCallbackCaptor))
+        verify(mModel).validateUserCredentialsWithCallback(userCorrect,passworCorrect,capture(operationCallbackCaptor))
         operationCallbackCaptor.value.result(false)
 
         mPresenter.onLoginAsyncButtonClick()
         verify(mView).errorAuth()
-
 
     }
 

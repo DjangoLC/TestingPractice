@@ -6,6 +6,11 @@ import org.mockito.Captor
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.djangomx.testingpractice.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
 import org.junit.*
 import org.mockito.MockitoAnnotations
 
@@ -27,10 +32,13 @@ class LoginActTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    private val testDispatcher = TestCoroutineDispatcher()
+
     @Before
     fun setUp() {
 
         MockitoAnnotations.initMocks(this)
+        Dispatchers.setMain(testDispatcher)
 
         mView = mock()
         mModel = mock()
@@ -104,8 +112,35 @@ class LoginActTest {
     }
 
 
+    @Test
+    fun validateCredentialsWithSuspendSuccess() {
+        whenever(mView.getUserName()).thenReturn(userCorrect)
+        whenever(mView.getPassword()).thenReturn(passworCorrect)
+
+        runBlockingTest {
+            whenever(mModel.validateUserCredentialsSuspend(userCorrect,passworCorrect)).thenReturn(true)
+
+            mPresenter.onLoginAsyncCoroutineButtonClick()
+            verify(mView, times(1)).successAuth()
+        }
+    }
+
+    @Test
+    fun validateCredentialsWithSuspendError() {
+        whenever(mView.getUserName()).thenReturn(userCorrect)
+        whenever(mView.getPassword()).thenReturn(paswordFail)
+
+        runBlockingTest {
+            whenever(mModel.validateUserCredentialsSuspend(userCorrect,paswordFail)).thenReturn(false)
+
+            mPresenter.onLoginAsyncCoroutineButtonClick()
+            verify(mView, times(1)).errorAuth()
+        }
+    }
+
+
     @After
     fun tearDown() {
-
+        Dispatchers.resetMain()
     }
 }

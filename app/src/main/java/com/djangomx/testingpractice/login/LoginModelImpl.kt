@@ -5,10 +5,9 @@ import com.djangomx.testingpractice.ServiceValidator
 import kotlin.coroutines.suspendCoroutine
 import kotlin.coroutines.resume
 
-
 class LoginModelImpl : LoginContract.LoginModel {
 
-    val serviceValidator = ServiceValidator()
+    private val serviceValidator = ServiceValidator()
 
     override fun validateUserCredentials(userName: String, password: String): Boolean {
         return userName == "kike" && password == "123"

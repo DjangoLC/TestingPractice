@@ -1,21 +1,22 @@
 package com.djangomx.testingpractice.login
 
-import com.nhaarman.mockitokotlin2.*
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.djangomx.testingpractice.R
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
-import org.junit.*
+import org.junit.After
+import org.junit.Test
+
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Rule
 import org.mockito.MockitoAnnotations
 
-class LoginActTest {
+class LoginPresenterImplTest {
 
     private lateinit var mPresenter: LoginContract.LoginPresenter
     private lateinit var mView: LoginContract.LoginView

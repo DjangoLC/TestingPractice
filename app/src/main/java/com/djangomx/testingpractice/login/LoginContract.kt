@@ -33,8 +33,6 @@ interface LoginContract {
             callback: CallbackLogin
         )
 
-        fun validateUserCredentialsWithCallback(callback: CallbackLogin)
-
         suspend fun validateUserCredentialsSuspend(
             userName: String,
             password: String
